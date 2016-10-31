@@ -1,0 +1,299 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <math.h>
+/*-----------------------------------------------------*/
+#define Num_Nos 6
+#define INFINITO 10000
+#define Numero_Tela 5
+/*-----------------------------------------------------*/
+void Inicializar(int Numero_de_Nos);
+int Lista_Opcoes(void);
+void Preencher_Grafo(int Numero_de_Nos);
+void Preencher_Grafo1(int Numero_de_Nos);
+void Exibir_Grafo(int Numero_de_Nos);
+void Caminho_Minimo(int Origem, int Numero_de_Nos);
+int Calc_Minimo(int S[],float Dist[],int NN);
+void Imprimir_Caminho(int Destino, int Pred[]);
+/*-----------------------------------------------------*/
+float Custo[Num_Nos][Num_Nos];
+int Numero_de_Nos;
+/*-----------------------------------------------------*/
+main(){
+   Numero_de_Nos=Num_Nos;
+   Inicializar(Num_Nos);
+   while(Lista_Opcoes());
+  double L2 = 100 ;
+  double L1 ;
+}
+/*-----------------------------------------------------*/
+void Inicializar(int Numero_de_Nos){
+    int i,j;
+    for(i=0;i<Numero_de_Nos;i++)
+      for(j=0;j<Numero_de_Nos;j++)
+        if(i==j)
+          Custo[i][j]=0;
+        else
+          Custo[i][j]=-1;
+}
+/*-----------------------------------------------------*/
+int Lista_Opcoes(){
+	int opcao;
+	int Origem;
+
+	
+	printf("Digite: \n");
+	printf("1. Para Preencher o Grafo. \n");
+	printf("2. Executar Dijkstra. \n");
+	printf("3. Preencher Grafo Exemplo. \n");
+	printf("4. Exibir Grafo.\n");
+	printf("5. Extrategia de compras.\n");
+	printf("6. Log.\n");
+	printf("0. Para Sair. \n");
+	printf("Opcao: ");
+	scanf("%d",&opcao);
+	switch(opcao){
+		double L2 = 100; 
+		double L1 ;
+	   case 1:
+	     printf("Digite o numero de vertices do grafo: ");
+	     scanf("%d",&Numero_de_Nos);
+	     Preencher_Grafo(Numero_de_Nos);
+	     break;
+	   case 2:
+	     printf("Digite a origem: \n");
+	     scanf("%d", &Origem);
+	     printf("\n");
+	    
+	     Caminho_Minimo(Origem,Numero_de_Nos);
+	     break;
+	   case 3:
+	     Preencher_Grafo1(Numero_de_Nos);
+	     break;
+	   case 4:
+	     Exibir_Grafo(Numero_de_Nos);
+	     break;
+	   case 5:						// Regras adotadas para saber se é viável fazer manutenção 
+	     printf("Medidas adotadas pelo gerente de compras: \n \n") ;
+	     printf("Medida 1: Para custo total menor que 30, busca-se fazer manutenção! \n ") ;
+	     printf("Medida 2: Para custo total  >= 30, é viável comprar outro equipamento! \n ") ;
+	     break;
+	   default:
+	     printf("Esta opcao nao consta\n");
+	}
+	return opcao;
+}
+/*-----------------------------------------------------*/
+void Preencher_Grafo(int Numero_de_Nos){
+    int i,j;
+    float cc;
+    for(i=0;i<Numero_de_Nos;i++)
+      for(j=0;j<Numero_de_Nos;j++){
+	    if(i!=j){
+	      
+	       printf("Digite o custo ");
+	       printf("da Origem: %d, para o Destino: %d:\n",i,j);
+	       scanf("%f",&cc);
+	       Custo[i][j]=cc;
+	     }
+      }
+}
+/*-----------------------------------------------------*/
+void Caminho_Minimo(int Origem, int Numero_de_Nos){
+    int i,w,u;
+    int *Pred;
+    int *S;
+    float *Dist;
+
+    Dist=(float *)malloc(sizeof(float)*Numero_de_Nos);
+    Pred=(int *)malloc(sizeof(int)*Numero_de_Nos);
+    S=(int *)malloc(sizeof(int)*Numero_de_Nos);
+
+    for(i=0;i<Numero_de_Nos;i++){
+	S[i]=0;
+	Dist[i]=Custo[Origem][i];
+	if(Dist[i]!=INFINITO)
+	   Pred[i]=Origem;
+	else
+	  Pred[i]=-1;
+    }
+    Pred[Origem]=-1;
+    S[Origem]=1;
+    Dist[Origem]=0;
+
+    for(i=1;i<Numero_de_Nos-1;i++){
+	u=Calc_Minimo(S,Dist,Numero_de_Nos);
+	S[u]=1;
+	for(w=0;w<Numero_de_Nos;w++){
+	   if((S[w]==0)&&(Dist[w]>Dist[u]+Custo[u][w])){
+	       Pred[w]=u;
+	       Dist[w]=Dist[u]+Custo[u][w];
+	   }
+	}
+    }
+    /*--------------------------------------------------*/
+    printf("\n");
+    printf("Lista de Distancias");
+    printf("\n");
+    for(i=0;i<Numero_de_Nos;i++){
+      printf("Dist[%d]=%f \n",i,Dist[i]);
+    }
+    printf("\n");
+    printf("Lista de Predecessores\n");
+    for(i=Numero_de_Nos-1;i>=0;i--){
+       printf("Pred[%d]=%d \n",i,Pred[i]);
+    }
+
+    for(i=Numero_de_Nos-1;i>=0;i--){
+       Imprimir_Caminho(i, Pred);
+       printf("\n");
+    }
+    printf("Aperte qq tecla para voltar p/ o programa principal!");
+    getch();
+}
+/*-----------------------------------------------------*/
+int Calc_Minimo(int S[],float Dist[],int NN){
+    int i,Achou, Indice;
+    float Menor;
+
+    i=0;
+    Achou=0;
+    /*Procura o primeiro elemento com S[i]==0*/
+    while(!(Achou)&&(i<NN)){
+      if(S[i]==0){
+	Achou=1;
+	Menor=Dist[i];
+	Indice=i;
+      }
+      else
+	i++;
+    }/* while */
+
+    if(Achou==0)
+      return -1; /* Todos  os elementos de S ja foram visitados) */
+
+    /*Procura o menor elemento com S[i]==0*/
+    for(;i<NN;i++){
+      if((S[i]==0)&&(Menor>Dist[i])){
+	Menor=Dist[i];
+	Indice=i;
+      }
+    }/* for */
+
+    return Indice;
+}
+/*-----------------------------------------------------*/
+void Exibir_Grafo(int Numero_de_Nos){
+  int i,j;
+
+  
+  printf("*-----------------------------------------*\n");
+  printf("               Grafo          \n");
+  printf("*-----------------------------------------*\n");
+  for(i=0;i<Numero_de_Nos;i++){
+    for(j=0;j<Numero_de_Nos;j++){
+       printf("Custo[%d][%d]= %10.3f\n",i,j,Custo[i][j]);
+       if(j>=Numero_Tela){
+	  printf(" Aperte qq tecla para continuar ...\n");
+	  printf("*----------------------------------------*\n");
+	  getch();
+       }
+    }
+  }
+}
+/*-----------------------------------------------------*/
+void Imprimir_Caminho(int Destino, int Pred[]){
+  int x;
+  x=Destino;
+  while(x!=-1){
+    printf("%d",x);
+    x=Pred[x];
+    if(x!=-1)
+      printf(" - ");
+  }/*while(x!=-1)*/
+}
+/*-----------------------------------------------------*/
+/* Num_Nos == 4*/
+/*
+void Preencher_Grafo1(int Numero_de_Nos){
+  int i,j;
+
+  for(i=0;i<Numero_de_Nos;i++)
+    for(j=0;j<Numero_de_Nos;j++)
+       Custo[i][j]=INFINITO;
+
+
+  for(i=0;i<Numero_de_Nos;i++)
+     Custo[i][i]=0;
+
+
+  Custo[0][1]=10;
+  Custo[0][2]=20;
+  Custo[0][3]=50;
+
+  Custo[1][2]=5;
+  Custo[1][3]=30;
+
+  Custo[2][1]=10;
+  Custo[2][3]=5;
+}
+*/
+/*-----------------------------------------------------*/
+/* Num_Nos == 6*/
+/*
+void Preencher_Grafo1(int Numero_de_Nos){
+  int i,j;
+
+  for(i=0;i<Numero_de_Nos;i++)
+    for(j=0;j<Numero_de_Nos;j++)
+	Custo[i][j]=INFINITO;
+
+  for(i=0;i<Numero_de_Nos;i++)
+       Custo[i][i]=0;
+
+  Custo[0][1]=50;
+  Custo[0][2]=10;
+  Custo[0][4]=45;
+  Custo[1][2]=15;
+  Custo[1][4]=10;
+  Custo[2][0]=20;
+  Custo[2][3]=15;
+  Custo[3][0]=20;
+  Custo[3][4]=35;
+  Custo[4][3]=30;
+  Custo[5][3]=3;
+
+}
+*/
+/*-----------------------------------------------------*/
+/* Num_Nos == 6*/
+
+void Preencher_Grafo1(int Numero_de_Nos){
+  int i,j;
+
+  for(i=0;i<Numero_de_Nos;i++)
+    for(j=0;j<Numero_de_Nos;j++)
+      Custo[i][j]=INFINITO;
+
+  for(i=0;i<Numero_de_Nos;i++)
+      Custo[i][i]=0;
+
+  Custo[0][1]=15;
+  Custo[0][4]=9;
+
+  Custo[1][2]=35;
+  Custo[1][3]=3;
+
+  Custo[2][1]=16;
+  Custo[2][3]=6;
+  Custo[2][5]=21;
+
+  Custo[3][4]=2;
+  Custo[3][5]=7;
+
+  Custo[4][1]=4;
+  Custo[4][3]=2;
+
+  Custo[5][2]=5;
+
+}
